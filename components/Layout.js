@@ -10,6 +10,7 @@ import { loadAnswers, initAnswerChanges, readAnswerChange } from "../actions/ans
 import { loadKeywords, initKeywordChanges, readKeywordChange } from "../actions/keywordActions"
 import { loadLinks, initLinkChanges, readLinkChange } from "../actions/linkActions"
 import { loaderSwitch, initDataLoaded } from "../actions/globalActions"
+import {  }
 import Nav from "../components/Nav";
 
 @connect((store) => {
@@ -32,23 +33,25 @@ class Layout extends React.Component {
       this.props.dispatch( loadAnswers( { ws: this.props.ws } ) ).then( ()=>{
         this.props.dispatch( loadKeywords( { ws: this.props.ws } ) ).then( ()=>{
           this.props.dispatch( loadLinks( { ws: this.props.ws } ) ).then( ()=>{
-            let aws = new WebSocket("ws://localhost:3001");
-            this.props.dispatch( initAnswerChanges( { ws: aws } ) )
-            aws.onmessage = (e) => {
-              this.props.dispatch( readAnswerChange( { msg: e.data } ) );
-            }
-            let kws = new WebSocket("ws://localhost:3001");
-            this.props.dispatch( initKeywordChanges( { ws: kws } ) )
-            kws.onmessage = (e) => {
-              this.props.dispatch( readKeywordChange( { msg: e.data } ) );
-            }
-            let lws = new WebSocket("ws://localhost:3001");
-            this.props.dispatch( initLinkChanges( { ws: lws } ) )
-            lws.onmessage = (e) => {
-              this.props.dispatch( readLinkChange( { msg: e.data } ) );
-            }
-            this.props.dispatch( loaderSwitch( false ));
-            this.props.dispatch( initDataLoaded( false ));
+              this.props.dispatch( loadLinks( { ws: this.props.ws } ) ).then( ()=>{
+                let aws = new WebSocket("ws://localhost:3001");
+                this.props.dispatch( initAnswerChanges( { ws: aws } ) )
+                aws.onmessage = (e) => {
+                  this.props.dispatch( readAnswerChange( { msg: e.data } ) );
+                }
+                let kws = new WebSocket("ws://localhost:3001");
+                this.props.dispatch( initKeywordChanges( { ws: kws } ) )
+                kws.onmessage = (e) => {
+                  this.props.dispatch( readKeywordChange( { msg: e.data } ) );
+                }
+                let lws = new WebSocket("ws://localhost:3001");
+                this.props.dispatch( initLinkChanges( { ws: lws } ) )
+                lws.onmessage = (e) => {
+                  this.props.dispatch( readLinkChange( { msg: e.data } ) );
+                }
+                this.props.dispatch( loaderSwitch( false ));
+                this.props.dispatch( initDataLoaded( false ));
+            } )
           } )
         } )
       } )

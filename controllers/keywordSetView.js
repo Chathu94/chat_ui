@@ -181,7 +181,7 @@ export default class answerView extends React.Component {
       if ( !/^[a-zA-Z0-9-_]+$/.test( val ) ){
         this.setState( { ...this.state, setClass: "form-group has-error" } )
       } else {
-        this.setState( { ...this.state, setClass: "form-group" } )
+        this.setState( { ...this.state, setClass: "form-group has-success" } )
       }
     }
   }
