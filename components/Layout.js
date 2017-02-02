@@ -10,7 +10,7 @@ import { loadAnswers, initAnswerChanges, readAnswerChange } from "../actions/ans
 import { loadKeywords, initKeywordChanges, readKeywordChange } from "../actions/keywordActions"
 import { loadLinks, initLinkChanges, readLinkChange } from "../actions/linkActions"
 import { loaderSwitch, initDataLoaded } from "../actions/globalActions"
-import {  }
+import { loadKeywordSets, initKeywordSetChanges, readKeywordSetChange } from "../actions/keywordSetActions"
 import Nav from "../components/Nav";
 
 @connect((store) => {
@@ -33,7 +33,7 @@ class Layout extends React.Component {
       this.props.dispatch( loadAnswers( { ws: this.props.ws } ) ).then( ()=>{
         this.props.dispatch( loadKeywords( { ws: this.props.ws } ) ).then( ()=>{
           this.props.dispatch( loadLinks( { ws: this.props.ws } ) ).then( ()=>{
-              this.props.dispatch( loadLinks( { ws: this.props.ws } ) ).then( ()=>{
+              this.props.dispatch( loadKeywordSets( { ws: this.props.ws } ) ).then( ()=>{
                 let aws = new WebSocket("ws://localhost:3001");
                 this.props.dispatch( initAnswerChanges( { ws: aws } ) )
                 aws.onmessage = (e) => {
@@ -48,6 +48,11 @@ class Layout extends React.Component {
                 this.props.dispatch( initLinkChanges( { ws: lws } ) )
                 lws.onmessage = (e) => {
                   this.props.dispatch( readLinkChange( { msg: e.data } ) );
+                }
+                let ksws = new WebSocket("ws://localhost:3001");
+                this.props.dispatch( initKeywordSetChanges( { ws: ksws } ) )
+                ksws.onmessage = (e) => {
+                  this.props.dispatch( readKeywordSetChange( { msg: e.data } ) );
                 }
                 this.props.dispatch( loaderSwitch( false ));
                 this.props.dispatch( initDataLoaded( false ));

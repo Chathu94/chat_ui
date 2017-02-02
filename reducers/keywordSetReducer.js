@@ -101,7 +101,7 @@ export default function reducer ( state={
         } else {
           $.notify({
             icon: 'glyphicon glyphicon-info-sign',
-            message: "Keywords #" + obj.data.id + " Updated!"
+            message: "Keyword Set #" + obj.data.id + " Updated!"
           },{
             type: 'success'
           });
@@ -131,7 +131,7 @@ export default function reducer ( state={
         } else {
           $.notify({
             icon: 'glyphicon glyphicon-info-sign',
-            message: "Keyword #" + obj.data.id + " Deleted!"
+            message: "Keyword Set #" + obj.data.id + " Deleted!"
           },{
             type: 'success'
           });
@@ -161,7 +161,7 @@ export default function reducer ( state={
         } else {
           $.notify({
             icon: 'glyphicon glyphicon-info-sign',
-            message: "Keyword #" + obj.data.id + " Added!"
+            message: "Keyword Set #" + obj.data.id + " Added!"
           },{
             type: 'success'
           });

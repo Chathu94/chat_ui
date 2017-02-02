@@ -1,7 +1,8 @@
 import React from "react"
 import { connect } from "react-redux"
 import { Model } from "elemental"
-import $ from "jquery"
+
+import bootbox from "Bootbox"
 
 import { addAnswer } from "../actions/answerActions"
 import { updateKeywordSet, deleteKeywordSet, addKeywordSet } from "../actions/keywordSetActions"
@@ -112,14 +113,12 @@ export default class answerView extends React.Component {
 
   EditLink( e ){
     if ( this.state.edits[e] == null || this.state.edits[e] == false ){
-      this.refs[ "answers_" + e ].enableSelector()
       this.refs[ "keywords_" + e ].enableSelector()
       let edits = this.state.edits
       edits[e] = true
       this.setState( { ...this.state, edits: edits } )
       $( this.refs[ "edit_save_" + e ].children[0] ).removeClass("fa-pencil-square-o").addClass("fa-floppy-o")
     } else {
-      this.refs[ "answers_" + e ].disableSelector()
       this.refs[ "keywords_" + e ].disableSelector()
       let edits = this.state.edits
       edits[e] = false
@@ -132,7 +131,7 @@ export default class answerView extends React.Component {
     let props = this.props;
     this.props.dispatch( loaderSwitch( true ));
     let loaded = ()=>{ props.dispatch( loaderSwitch( false )) }
-    this.props.dispatch( deleteLink( { id: e, ws: this.props.data.ws } ) ).then( loaded, loaded );
+    this.props.dispatch( deleteKeywordSet( { id: e, ws: this.props.data.ws } ) ).then( loaded, loaded );
   }
 
   updateLink(e){
@@ -150,8 +149,8 @@ export default class answerView extends React.Component {
   }
 
   DeleteLink( e ){
-    let clnk = this.props.data.links[e]
-    let self = this;
+    let clnk = this.props.data.keyword_set[e]
+    let self = this
     bootbox.confirm({
       title: "Delete Link #" + e,
       message: "Do you want to delete link #" + clnk.id + " ? This cannot be undone.",
@@ -181,46 +180,56 @@ export default class answerView extends React.Component {
       if ( !/^[a-zA-Z0-9-_]+$/.test( val ) ){
         this.setState( { ...this.state, setClass: "form-group has-error" } )
       } else {
-        this.setState( { ...this.state, setClass: "form-group has-success" } )
+        let found_match = false;
+        $.each( this.props.data.keyword_set, function(k, v){
+          if ( v.iden == val ){
+            found_match = true;
+          }
+        })
+        if ( found_match ){
+          this.setState( { ...this.state, setClass: "form-group has-error" } )
+        } else {
+          this.setState( { ...this.state, setClass: "form-group has-success" } )
+        }
       }
     }
   }
 
   render() {
-    let rows = this.props.data.keyword_set.map( (link, key) => {
-      // if ( link != null ){
-      //   let match = false;
-      //   link.answer.split(",").forEach( (aid)=>{
-      //     this.props.data.answers.forEach( (a)=>{
-      //       if ( a.id == aid ){
-      //         if ( a.answer.match( this.state.search.trim()  ) ){
-      //           match = true
-      //         }
-      //       }
-      //     } )
-      //   } )
-      //   if ( match ){
-      //
+    let rows = this.props.data.keyword_set.map( (keyword_set, key) => {
+       if ( keyword_set != null ){
+         let match = false;
+         console.log(keyword_set)
+         keyword_set.keywords.split(",").forEach( (kid)=>{
+          this.props.data.keywords.forEach( (k)=>{
+            if ( k.id == kid ){
+              if ( k.keyword.match( this.state.search.trim()  ) ){
+                match = true
+              }
+            }
+          } )
+        } )
+        if ( match ){
       //     let refa = "answers_" + link.id
-      //     let refk = "keywords_" + link.id
-      //     let refes = "edit_save_" + link.id
+           let refk = "keywords_" + keyword_set.id
+           let refes = "edit_save_" + keyword_set.id
       //     let answer_s = <Selector disabled="true" items={link.answer.split(",")} options={this.props.data.answers} ref={refa} id="id" value="answer" initial_done={this.props.data.initial_done} />
-      //     let keyword_s = <Selector disabled="true" items={link.keyword.split(",")} options={this.props.data.keywords} ref={refk} id="id" value="keyword" initial_done={this.props.data.initial_done} />
-      //     return <tr key={link.id}>
-      //             <td>{link.id}</td>
-      //             <td>{answer_s}</td>
-      //             <td>{keyword_s}</td>
-      //             <td class="text-right" class="b">
-      //               <button class="btn btn-primary" ref={refes} onClick={this.EditLink.bind(this, link.id)}>
-      //                 <i class="fa fa-pencil-square-o" />
-      //               </button>
-      //               <button class="btn btn-warning" onClick={this.DeleteLink.bind(this, key)}>
-      //                 <i class="fa fa-trash" />
-      //               </button>
-      //             </td>
-      //           </tr>
-      //   }
-      // }
+           let keyword_s = <Selector disabled="true" items={keyword_set.keywords.split(",")} options={this.props.data.keywords} ref={refk} id="id" value="keyword" initial_done={this.props.data.initial_done} />
+          return <tr key={keyword_set.id}>
+                  <td>{keyword_set.id}</td>
+                  <td>{keyword_set.iden}</td>
+                  <td>{keyword_s}</td>
+                  <td class="text-right" class="b">
+                    <button class="btn btn-primary" ref={refes} onClick={this.EditLink.bind(this, keyword_set.id)}>
+                      <i class="fa fa-pencil-square-o" />
+                    </button>
+                    <button class="btn btn-warning" onClick={this.DeleteLink.bind(this, key)}>
+                      <i class="fa fa-trash" />
+                    </button>
+                  </td>
+                </tr>
+        }
+      }
         //console.log();
         // if ( this.state.search.trim() == "" || link.answer.match( this.state.search.trim() ) ){
         //   let answer_s = answer.answer;
